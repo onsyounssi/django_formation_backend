@@ -12,7 +12,7 @@ class StudentSerializer(serializers.ModelSerializer): # ModelSerializer(middelwa
         read_anly_fields = ["id"] # variable : read_anly_fields(c'est un attribut)
     
     # les  validateurs en(email) sous forme des fonctions et self : pour accedée les fonstion ou les variable
-    def validator_email(self,value): # function : validator_email( c'est un methode) 
+    def validate_email(self,value): # function : validator_email( c'est un methode) 
         """
         Custom validations for email field. 
         this runs during both create and update operations        
@@ -33,7 +33,7 @@ class StudentSerializer(serializers.ModelSerializer): # ModelSerializer(middelwa
         return value
     
     # validateur en age
-    def validator_age(self, value):
+    def validate_age(self, value):
         """ 
         Custom validation for age field.
         """
