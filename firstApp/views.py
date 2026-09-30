@@ -159,3 +159,63 @@ def get_students(request):
     serializer =StudentSerializer(students, many=True) #  any=true :si que plusieur students
     return JsonResponse({"students": serializer.data, "count": len(serializer.data)}, status=200)
 
+@csrf_exempt
+@require_http_methods(["GET"])
+def get_student(request, pk):
+    """Get: retrieve a student"""
+    try:
+        student = Student.objects.get(id= pk)
+        serializer = StudentSerializer(student)
+        return JsonResponse({"student": serializer.data},status=200)
+    except Student.DoesNotExist:
+        return JsonResponse({"error": "student not found"},status=404)
+    
+@csrf_exempt
+@require_http_methods(['POST']) # decorateur pour le methode est verifier 
+def create_Student(request):
+    """POST : create a new student"""
+    json_data = json.loads(request.body)
+    serializer = StudentSerializer(data=json_data)
+    if serializer.is_valid():
+        # si student is valide 
+        student = serializer.save()
+        student_data = StudentSerializer(student).data
+        
+        return JsonResponse({
+            "message": "student created sucessfully",
+            "student": student_data
+            }, status= 201)
+    # le msg d'erreure sur les validateur en verifier dans le fichier serializer
+    return JsonResponse({"error": serializer.errors}, status= 400)
+
+@csrf_exempt
+@require_http_methods(['PUT','PATCH'])
+def update_student(request, student_id):
+    """PUT/PATCH : update a student """
+    data =json.loads(request.body)
+    try:
+        student= Student.objects.get(id=student_id)
+    except Student.DoesNotExist :
+        return JsonResponse({"error": "student not found"}, status=404)
+    
+    update_serializer = StudentSerializer(student, data=data)
+    
+    if update_serializer.is_valid():
+        students =update_serializer.save()
+        student_data =StudentSerializer(students).data
+        return JsonResponse({
+            "message": "student update successfuly",
+            "student": student_data}, 
+            status=200)
+    return JsonResponse({"error": update_serializer.errors},status=400)
+
+@csrf_exempt
+@require_http_methods(["DELETE"])
+def delete_student(request, sttudent_id):
+    """DELETE: deleted a student"""
+    try:
+        student = Student.objects.get(id=sttudent_id)
+        student.delete()
+        return JsonResponse({"message": "student deleted successfully"}, status=200)
+    except Student.DoesNotExist:
+        return JsonResponse({"error":"student not found"},status=404)
